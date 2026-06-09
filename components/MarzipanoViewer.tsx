@@ -115,6 +115,16 @@ export default function MarzipanoViewer() {
       const currentSceneObj = scenes[sceneData.sceneId].scene;
       if (!hotspotElementsRef.current[sceneData.sceneId]) hotspotElementsRef.current[sceneData.sceneId] = {};
       
+      // --- إضافة شعار الأرضية لإخفاء حامل الكاميرا (Nadir Logo) ---
+      const nadirElement = document.createElement('div');
+      nadirElement.className = 'nadir-logo';
+      nadirElement.innerHTML = `<img src="/logo.png" alt="Company Logo" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: 0 0 30px rgba(0,0,0,0.8);" onerror="this.style.display='none'" />`;
+      
+      currentSceneObj.hotspotContainer().createHotspot(nadirElement, 
+        { yaw: 0, pitch: Math.PI / 2 }, 
+        { perspective: { radius: 1000 } } 
+      );
+
       sceneData.hotspots.forEach((hotspot: any) => {
         // الحاوية الأساسية (لإحداثيات Marzipano)
         const hotspotWrapper = document.createElement('div');
@@ -459,6 +469,16 @@ export default function MarzipanoViewer() {
           opacity: 1 !important;
           visibility: visible !important;
           transform: translateX(-50%) translateY(0) !important;
+        }
+
+        /* تنسيق شعار الأرضية 3D */
+        .nadir-logo {
+          width: 350px;
+          height: 350px;
+          margin-left: -175px;
+          margin-top: -175px;
+          pointer-events: none; /* لمنع إعاقة السحب بالماوس في الأرضية */
+          opacity: 0.9;
         }
       `}</style>
       
