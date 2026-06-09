@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Marzipano from 'marzipano';
-import projectData from '../public/data/final_project_data.json';
 
 // دالة لتوليد أشكال مختلفة من النقاط الساخنة (نُقلت للخارج لتستخدمها واجهة التعديل)
 const getHotspotStyle = (type: string, customImageUrl?: string, opacity: number = 1) => {
@@ -58,6 +57,7 @@ export default function MarzipanoViewer() {
   const [editingHotspot, setEditingHotspot] = useState<any>(null);
   const [availableIcons, setAvailableIcons] = useState<string[]>([]);
   const [currentSceneId, setCurrentSceneId] = useState<string>('');
+  const [projectData, setProjectData] = useState<any>(null);
   const hotspotElementsRef = useRef<Record<string, Record<string, HTMLElement>>>({});
 
   // تم استبدال [YOUR_BUCKET_NAME] باسم الـ Bucket الحقيقي
@@ -65,6 +65,14 @@ export default function MarzipanoViewer() {
 
   // السماح بتعديل أماكن الأسهم فقط في بيئة التطوير (أثناء تشغيل npm run dev)
   const isEditMode = process.env.NODE_ENV === 'development';
+
+  // --- جلب البيانات ديناميكياً لتخطي كاش Next.js العنيد ---
+  useEffect(() => {
+    fetch('/data/final_project_data.json?t=' + new Date().getTime())
+      .then(res => res.json())
+      .then(data => setProjectData(data))
+      .catch(err => console.error("Error fetching project data:", err));
+  }, []);
 
   // جلب الأيقونات المتوفرة آلياً لعرضها في لوحة التحكم
   useEffect(() => {
@@ -84,7 +92,7 @@ export default function MarzipanoViewer() {
 
   useEffect(() => {
     const viewerElement = viewerRef.current;
-    if (!viewerElement) return;
+    if (!viewerElement || !projectData) return;
 
     const viewer = new Marzipano.Viewer(viewerElement);
     const scenes: Record<string, any> = {};
@@ -96,11 +104,13 @@ export default function MarzipanoViewer() {
       const source = Marzipano.ImageUrlSource.fromString(imageUrl);
       const geometry = new Marzipano.EquirectGeometry([{ width: 8192 }]); 
       
-      const view = new Marzipano.RectilinearView({
-        yaw: sceneData.initialYaw ?? 0,
-        pitch: sceneData.initialPitch ?? 0,
-        fov: Math.PI / 4
-      });
+      const view = new Marzipano.RectilinearView(
+        {
+          yaw: sceneData.initialYaw ?? 0,
+          pitch: sceneData.initialPitch ?? 0,
+          fov: Math.PI / 2 // زاوية 90 درجة بدلاً من 45 المسببة للزوم الشديد
+        }
+      );
 
       const scene = viewer.createScene({
         source: source,
@@ -129,14 +139,14 @@ export default function MarzipanoViewer() {
         // الحاوية الأساسية (لإحداثيات Marzipano)
         const hotspotWrapper = document.createElement('div');
         
-        // العنصر المرئي (للتصميم والحركة)
-        const hotspotVisual = document.createElement('div');
-        
-        // قراءة نوع النقطة من ملف JSON، وإذا لم نحدد لها نوع نستخدم الرادار الأرضي كافتراضي
+        const distance = hotspot.distance || 3.0;
         const type = hotspot.type || 'ground-radar';
         const opacity = hotspot.opacity !== undefined ? hotspot.opacity : 1;
         const label = hotspot.label || '';
-        
+
+        hotspotWrapper.style.zIndex = Math.round(1000 - distance).toString();
+        // العنصر المرئي (للتصميم والحركة)
+        const hotspotVisual = document.createElement('div');
         hotspotVisual.className = 'hotspot-visual';
         hotspotVisual.style.cursor = isEditMode ? 'grab' : 'pointer';
         hotspotVisual.title = label; // ضمان ظهور اسم الغرفة (Native Tooltip) كحل احتياطي قوي
@@ -157,7 +167,6 @@ export default function MarzipanoViewer() {
         
         hotspotVisual.appendChild(tooltip);
         hotspotVisual.appendChild(iconContainer);
-        
         hotspotWrapper.appendChild(hotspotVisual);
         hotspotElementsRef.current[sceneData.sceneId][hotspot.targetSceneId] = hotspotVisual;
         
@@ -307,7 +316,7 @@ export default function MarzipanoViewer() {
     return () => {
       viewer.destroy();
     };
-  }, []);
+  }, [projectData, isEditMode]);
 
   // دالة حفظ التغييرات من لوحة التحكم
   const handleSaveEdit = async () => {
@@ -475,15 +484,19 @@ export default function MarzipanoViewer() {
         .nadir-logo {
           width: 350px;
           height: 350px;
-          margin-left: -175px;
-          margin-top: -175px;
           pointer-events: none; /* لمنع إعاقة السحب بالماوس في الأرضية */
           opacity: 0.9;
+          /* هذا السطر ضروري لإجبار المتصفح على التعامل مع الشعار كجسم ثلاثي الأبعاد */
+          transform-style: preserve-3d;
         }
       `}</style>
       
+      {!projectData && (
+        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#00ffcc', fontSize: '20px', zIndex: 10 }}>جاري جلب البيانات الحية...</div>
+      )}
+
       {/* --- لوحة المستكشف الجانبية (لحل مشكلة اختفاء النقاط) --- */}
-      {isEditMode && currentSceneId && (
+      {isEditMode && currentSceneId && projectData && (
         <div style={{ position: 'absolute', top: 20, right: 20, width: 280, background: 'rgba(20,20,20,0.95)', padding: '16px', borderRadius: '12px', color: 'white', zIndex: 1000, border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', fontFamily: 'system-ui, sans-serif' }}>
           <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #444', paddingBottom: '8px' }}>📍 إدارة نقاط المشهد الحالي</h3>
           {projectData.scenes.find(s => s.sceneId === currentSceneId)?.hotspots.map((hs: any, idx: number) => (
@@ -514,7 +527,7 @@ export default function MarzipanoViewer() {
       )}
 
       {/* --- واجهة تحكم متقدمة لتخصيص النقطة التفاعلية تظهر فقط عند النقر الأيمن --- */}
-      {isEditMode && editingHotspot && (
+      {isEditMode && editingHotspot && projectData && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' }}>
           <div style={{ background: '#1e1e1e', padding: '24px', borderRadius: '12px', width: '360px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', color: 'white', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid #333', fontFamily: 'system-ui, sans-serif' }}>
             <h3 style={{ margin: 0, borderBottom: '1px solid #333', paddingBottom: '12px', fontSize: '18px', textAlign: 'center' }}>تخصيص النقطة التفاعلية</h3>
