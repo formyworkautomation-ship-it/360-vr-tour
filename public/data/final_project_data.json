@@ -1,322 +1,492 @@
 {
-  "scenes": [
-    {
-      "sceneId": "IMG_20260529_155451_00_238",
-      "northOffset": 0.8515,
-      "initialYaw": 3.0603,
-      "initialPitch": -0.0224,
-      "hotspots": [
+    "scenes": [
         {
-          "targetSceneId": "IMG_20260529_155535_00_239",
-          "distance": 12.21,
-          "yaw": -2.458484875092479,
-          "pitch": 0.1747871047260059,
-          "type": "ground-radar",
-          "opacity": 1
+            "sceneId": "IMG_20260529_155451_00_238",
+            "northOffset": 0.8515,
+            "initialYaw": 3.0603,
+            "initialPitch": -0.0224,
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155535_00_239",
+                    "yaw": -2.4342267407135996,
+                    "pitch": 0.18654699548834763,
+                    "type": "ground-radar",
+                    "label": "إلى 239"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155631_00_240",
+                    "yaw": -2.4609287739050814,
+                    "pitch": 0.045405226819070776,
+                    "type": "ground-radar",
+                    "label": "إلى 240"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160041_00_243",
+                    "yaw": 2.2491669971531625,
+                    "pitch": 0.03397760745054157,
+                    "type": "ground-radar",
+                    "label": "إلى 243"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160144_00_244",
+                    "yaw": 2.2507929666369515,
+                    "pitch": 0.09491049989854616,
+                    "type": "ground-radar",
+                    "label": "إلى 244"
+                }
+            ]
         },
         {
-          "targetSceneId": "IMG_20260529_155631_00_240",
-          "distance": 25.1,
-          "yaw": -2.464464614327019,
-          "pitch": 0.044408726731827386,
-          "type": "ground-radar",
-          "opacity": 1
+            "sceneId": "IMG_20260529_155535_00_239",
+            "northOffset": -3.1297,
+            "initialYaw": 1.6847,
+            "initialPitch": 0.0324,
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155631_00_240",
+                    "yaw": 1.542111084499763,
+                    "pitch": 0.10493644399527113,
+                    "type": "ground-radar",
+                    "label": "إلى 240"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155451_00_238",
+                    "yaw": -1.5658362375633672,
+                    "pitch": 0.16256880915667438,
+                    "type": "ground-radar",
+                    "label": "إلى 238"
+                }
+            ]
         },
         {
-          "targetSceneId": "IMG_20260529_155730_00_241",
-          "distance": 32.08,
-          "yaw": 2.968663481974051,
-          "pitch": 0.5371235564011592
+            "sceneId": "IMG_20260529_155631_00_240",
+            "northOffset": 2.8808,
+            "initialYaw": -0.5365,
+            "initialPitch": -0.3293,
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155451_00_238",
+                    "yaw": -1.3269873552528448,
+                    "pitch": 0.0318055976814513,
+                    "type": "ground-radar",
+                    "label": "إلى 238"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155535_00_239",
+                    "yaw": -1.328716768184183,
+                    "pitch": 0.08495656460537049,
+                    "type": "ground-radar",
+                    "label": "إلى 239"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155730_00_241",
+                    "yaw": 0.21161694026003275,
+                    "pitch": 0.1149343363822588,
+                    "type": "ground-radar",
+                    "label": "إلى 241"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155856_00_242",
+                    "yaw": 0.20211133214054122,
+                    "pitch": 0.020901754209734946,
+                    "type": "ground-radar",
+                    "label": "إلى 242"
+                }
+            ]
         },
         {
-          "targetSceneId": "IMG_20260529_155856_00_242",
-          "distance": 51.7,
-          "yaw": 2.2479600993979822,
-          "pitch": 0.032851963121238725
+            "sceneId": "IMG_20260529_155730_00_241",
+            "northOffset": 1.8539,
+            "initialYaw": -0.1381,
+            "initialPitch": 0.0229,
+            "hotspots": []
         },
         {
-          "targetSceneId": "IMG_20260529_160041_00_243",
-          "distance": 33.6,
-          "yaw": 2.1031,
-          "pitch": 0.2247,
-          "type": "ground-radar",
-          "opacity": 1
+            "sceneId": "IMG_20260529_155856_00_242",
+            "northOffset": -0.0021,
+            "initialYaw": 0.8691,
+            "initialPitch": 0.0832,
+            "hotspots": []
         },
         {
-          "targetSceneId": "IMG_20260529_160144_00_244",
-          "distance": 21.48,
-          "yaw": 2.2534531148096546,
-          "pitch": 0.08981464908053383,
-          "type": "ground-radar",
-          "opacity": 1
+            "sceneId": "IMG_20260529_160041_00_243",
+            "northOffset": -0.198,
+            "initialYaw": -0.0878,
+            "initialPitch": -0.0207,
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160144_00_244",
+                    "yaw": 0.1560256705287344,
+                    "pitch": 0.09987525334143399,
+                    "type": "ground-radar",
+                    "label": "إلى 244"
+                }
+            ]
+        },
+        {
+            "sceneId": "IMG_20260529_160144_00_244",
+            "northOffset": -1.6119,
+            "initialYaw": 0.0584,
+            "initialPitch": -0.0063,
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155451_00_238",
+                    "yaw": 1.555746399445379,
+                    "pitch": 0.09357797894879027,
+                    "type": "ground-radar",
+                    "label": "إلى 238"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160041_00_243",
+                    "yaw": -1.6193095185108977,
+                    "pitch": 0.07854842278103469,
+                    "type": "ground-radar",
+                    "label": "إلى 243"
+                }
+            ]
+        },
+        {
+            "sceneId": "IMG_20260529_160241_00_245",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_160316_00_246",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_160359_00_247",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_160440_00_248",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_160622_00_249mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_160733_00_250",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_160901_00_251",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161003_00_252mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161043_00_253mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161126_00_254mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161206_00_255",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161255_00_256",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161359_00_257",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161502_00_258",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161536_00_259",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161641_00_260",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161703_00_261",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161742_00_262",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161814_00_263",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_161840_00_264",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162157_00_265",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162222_00_266",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162319_00_267",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162341_00_268",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162419_00_269",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162449_00_270",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162512_00_271",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162637_00_272",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162730_00_273",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162839_00_274",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_162951_00_275",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_163051_00_276",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_163339_00_277",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_163455_00_278",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_163649_00_281",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164134_00_282",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164242_00_283",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164439_00_284",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164439_00_284mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164511_00_285",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164536_00_286",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164606_00_287",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164626_00_288mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164650_00_289",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164713_00_290mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164739_00_291mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164805_00_292mod",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164844_00_293",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
+        },
+        {
+            "sceneId": "IMG_20260529_164930_00_294",
+            "northOffset": 0,
+            "initialYaw": 0,
+            "initialPitch": 0,
+            "hotspots": []
         }
-      ]
-    },
-    {
-      "sceneId": "IMG_20260529_155535_00_239",
-      "northOffset": -3.1297,
-      "initialYaw": 1.6847,
-      "initialPitch": 0.0324,
-      "hotspots": [
-        {
-          "targetSceneId": "IMG_20260529_155451_00_238",
-          "distance": 12.21,
-          "yaw": -1.7562,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155631_00_240",
-          "distance": 12.9,
-          "yaw": 1.3583,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155730_00_241",
-          "distance": 23.3,
-          "yaw": 0.4481,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155856_00_242",
-          "distance": 46.82,
-          "yaw": 0.1092,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160041_00_243",
-          "distance": 35.9,
-          "yaw": -0.5458,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160144_00_244",
-          "distance": 24.79,
-          "yaw": -0.7086,
-          "pitch": 0.2247
-        }
-      ]
-    },
-    {
-      "sceneId": "IMG_20260529_155631_00_240",
-      "northOffset": 2.8808,
-      "initialYaw": -0.5365,
-      "initialPitch": -0.3293,
-      "hotspots": [
-        {
-          "targetSceneId": "IMG_20260529_155451_00_238",
-          "distance": 25.1,
-          "yaw": -1.4974,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155535_00_239",
-          "distance": 12.9,
-          "yaw": -1.5106,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155730_00_241",
-          "distance": 18.45,
-          "yaw": 0.1362,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155856_00_242",
-          "distance": 44.46,
-          "yaw": 0.1031,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160041_00_243",
-          "distance": 41.93,
-          "yaw": -0.568,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160144_00_244",
-          "distance": 32.95,
-          "yaw": -0.7874,
-          "pitch": 0.2247
-        }
-      ]
-    },
-    {
-      "sceneId": "IMG_20260529_155730_00_241",
-      "northOffset": 1.8539,
-      "initialYaw": -0.1381,
-      "initialPitch": 0.0229,
-      "hotspots": [
-        {
-          "targetSceneId": "IMG_20260529_155451_00_238",
-          "distance": 32.08,
-          "yaw": -1.0822,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155535_00_239",
-          "distance": 23.3,
-          "yaw": -1.394,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155631_00_240",
-          "distance": 18.45,
-          "yaw": -1.9785,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155856_00_242",
-          "distance": 26.02,
-          "yaw": 1.1065,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160041_00_243",
-          "distance": 30.32,
-          "yaw": 0.0538,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160144_00_244",
-          "distance": 26.32,
-          "yaw": -0.3541,
-          "pitch": 0.2247
-        }
-      ]
-    },
-    {
-      "sceneId": "IMG_20260529_155856_00_242",
-      "northOffset": -0.0021,
-      "initialYaw": 0.8691,
-      "initialPitch": 0.0832,
-      "hotspots": [
-        {
-          "targetSceneId": "IMG_20260529_155451_00_238",
-          "distance": 51.7,
-          "yaw": 0.3511,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155535_00_239",
-          "distance": 46.82,
-          "yaw": 0.1232,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155631_00_240",
-          "distance": 44.46,
-          "yaw": -0.1556,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155730_00_241",
-          "distance": 26.02,
-          "yaw": -0.1791,
-          "pitch": 0.2247,
-          "type": "ground-radar",
-          "opacity": 1
-        },
-        {
-          "targetSceneId": "IMG_20260529_160041_00_243",
-          "distance": 28.55,
-          "yaw": 0.9959,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160144_00_244",
-          "distance": 34.92,
-          "yaw": 0.6677,
-          "pitch": 0.2247
-        }
-      ]
-    },
-    {
-      "sceneId": "IMG_20260529_160041_00_243",
-      "northOffset": -0.198,
-      "initialYaw": -0.0878,
-      "initialPitch": -0.0207,
-      "hotspots": [
-        {
-          "targetSceneId": "IMG_20260529_155451_00_238",
-          "distance": 33.6,
-          "yaw": 0.011,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155535_00_239",
-          "distance": 35.9,
-          "yaw": -0.3359,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155631_00_240",
-          "distance": 41.93,
-          "yaw": -0.6308,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155730_00_241",
-          "distance": 30.32,
-          "yaw": -1.0358,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155856_00_242",
-          "distance": 28.55,
-          "yaw": -1.9498,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160144_00_244",
-          "distance": 12.12,
-          "yaw": 0.002,
-          "pitch": 0.2247
-        }
-      ]
-    },
-    {
-      "sceneId": "IMG_20260529_160144_00_244",
-      "northOffset": -1.6119,
-      "initialYaw": 0.0584,
-      "initialPitch": -0.0063,
-      "hotspots": [
-        {
-          "targetSceneId": "IMG_20260529_155451_00_238",
-          "distance": 21.48,
-          "yaw": 1.43,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155535_00_239",
-          "distance": 24.79,
-          "yaw": 0.9152,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155631_00_240",
-          "distance": 32.95,
-          "yaw": 0.5637,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155730_00_241",
-          "distance": 26.32,
-          "yaw": -0.0299,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_155856_00_242",
-          "distance": 34.92,
-          "yaw": -0.864,
-          "pitch": 0.2247
-        },
-        {
-          "targetSceneId": "IMG_20260529_160041_00_243",
-          "distance": 12.12,
-          "yaw": -1.7257,
-          "pitch": 0.2247
-        }
-      ]
-    }
-  ]
+    ]
 }

@@ -1,0 +1,14 @@
+# الخطوة 1: إضافة كل التعديلات للمرحلة المؤقتة
+git add .
+
+# الخطوة 2: حفظ التعديلات مع رسالة توثيقية
+git commit -m "feat: Implement drag-and-drop hotspot creation with side panel"
+
+# الخطوة 3: الانتقال إلى الفرع الرئيسي
+git checkout master
+
+# الخطوة 4: دمج فرع الميزات في الفرع الرئيسي
+git merge feature/manual-hotspot-builder
+
+# الخطوة 5 (اختياري لكن موصى به): حذف فرع الميزات بعد دمجه بنجاح
+git branch -d feature/manual-hotspot-builder

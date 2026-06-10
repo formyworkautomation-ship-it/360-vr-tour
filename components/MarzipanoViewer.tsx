@@ -74,6 +74,8 @@ export default function MarzipanoViewer() {
   const [currentSceneId, setCurrentSceneId] = useState<string>('');
   const [projectData, setProjectData] = useState<any>(null);
   const hotspotElementsRef = useRef<Record<string, Record<string, HTMLElement>>>({});
+  const viewerInstanceRef = useRef<any>(null);
+  const scenesRef = useRef<Record<string, any>>({});
 
   // تم استبدال [YOUR_BUCKET_NAME] باسم الـ Bucket الحقيقي
   const SUPABASE_STORAGE_URL = "https://ejvnmawlifhdytktdzer.supabase.co/storage/v1/object/public/tours/project_01/";
@@ -110,6 +112,7 @@ export default function MarzipanoViewer() {
     if (!viewerElement || !projectData) return;
 
     const viewer = new Marzipano.Viewer(viewerElement);
+    viewerInstanceRef.current = viewer; // حفظ النسخة لاستخدامها عند الإفلات
     const scenes: Record<string, any> = {};
     hotspotElementsRef.current = {};
 
@@ -135,6 +138,8 @@ export default function MarzipanoViewer() {
 
       scenes[sceneData.sceneId] = { scene, data: sceneData };
     });
+
+    scenesRef.current = scenes; // تعريض المشاهد للخارج ليتمكن شريط الصور من استخدامها
 
     projectData.scenes.forEach((sceneData) => {
       const currentSceneObj = scenes[sceneData.sceneId].scene;
@@ -395,8 +400,59 @@ export default function MarzipanoViewer() {
     setEditingHotspot(null);
   };
 
+  // --- منطق منصة البناء: استقبال الصورة المسحوبة وتحويلها لنقطة ساخنة ---
+  const handleDropOnViewer = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const targetId = e.dataTransfer.getData('targetSceneId');
+    if (!targetId || targetId === currentSceneId) return;
+
+    const viewer = viewerInstanceRef.current;
+    if (!viewer || !viewerRef.current) return;
+
+    const rect = viewerRef.current.getBoundingClientRect();
+    const view = viewer.view();
+    // قراءة إحداثيات الماوس الهندسية في مكان الإفلات
+    const coords = view.screenToCoordinates({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+
+    if (coords) {
+      console.log(`🎯 تم إسقاط مشهد [${targetId}] لإنشاء نقطة انتقال!`);
+      
+      try {
+        const res = await fetch('/api/add-hotspot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sourceSceneId: currentSceneId,
+            targetSceneId: targetId,
+            yaw: coords.yaw,
+            pitch: coords.pitch,
+            type: 'ground-radar',
+            label: `إلى ${targetId.split('_').pop()}`
+          })
+        });
+        
+        if (res.ok) {
+          // تحديث الواجهة فوراً لإظهار النقطة الجديدة
+          const updatedData = JSON.parse(JSON.stringify(projectData));
+          const sceneIndex = updatedData.scenes.findIndex((s: any) => s.sceneId === currentSceneId);
+          if (sceneIndex !== -1) {
+            updatedData.scenes[sceneIndex].hotspots.push({ targetSceneId: targetId, yaw: coords.yaw, pitch: coords.pitch, type: 'ground-radar', label: `إلى ${targetId.split('_').pop()}` });
+            setProjectData(updatedData); // إعادة التصيير لإظهار النقطة
+          }
+        }
+      } catch (err) {
+        console.error("❌ فشل حفظ النقطة الجديدة:", err);
+      }
+    }
+  };
+
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#141414' }}>
+    <div 
+      style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#141414' }}
+      onDragEnter={(e) => { e.preventDefault(); }}
+      onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }}
+      onDrop={handleDropOnViewer}
+    >
       <style>{`
         @keyframes pulse-animation {
           0% { transform: scale(0.8); opacity: 0.8; }
@@ -523,9 +579,9 @@ export default function MarzipanoViewer() {
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#00ffcc', fontSize: '20px', zIndex: 10 }}>جاري جلب البيانات الحية...</div>
       )}
 
-      {/* --- لوحة المستكشف الجانبية (لحل مشكلة اختفاء النقاط) --- */}
+      {/* --- لوحة المستكشف الجانبية (نُقلت لليسار لتوسيع المجال للشريط الأيمن) --- */}
       {isEditMode && currentSceneId && projectData && (
-        <div style={{ position: 'absolute', top: 20, right: 20, width: 280, background: 'rgba(20,20,20,0.95)', padding: '16px', borderRadius: '12px', color: 'white', zIndex: 1000, border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', fontFamily: 'system-ui, sans-serif' }}>
+        <div style={{ position: 'absolute', top: 20, left: 20, width: 280, background: 'rgba(20,20,20,0.95)', padding: '16px', borderRadius: '12px', color: 'white', zIndex: 1000, border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', fontFamily: 'system-ui, sans-serif' }}>
           <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #444', paddingBottom: '8px' }}>📍 إدارة نقاط المشهد الحالي</h3>
           {projectData.scenes.find(s => s.sceneId === currentSceneId)?.hotspots.map((hs: any, idx: number) => (
             <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', background: '#2a2a2a', padding: '10px', borderRadius: '6px', border: '1px solid #444' }}>
@@ -549,6 +605,37 @@ export default function MarzipanoViewer() {
                 }}
                 style={{ background: '#0078ff', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
               >تعديل</button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* --- منصة البناء (شريط الصور المصغرة الجانبي الأيمن) --- */}
+      {isEditMode && projectData && (
+        <div className="custom-scrollbar" style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '130px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(10,10,10,0.85)', padding: '16px 12px', overflowY: 'auto', overflowX: 'hidden', zIndex: 1000, borderLeft: '1px solid #333', backdropFilter: 'blur(10px)' }}>
+          <style>{`.custom-scrollbar::-webkit-scrollbar { width: 6px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }`}</style>
+          {projectData.scenes.map((s: any) => (
+            <div
+              key={s.sceneId}
+              draggable={s.sceneId !== currentSceneId}
+              onDragStart={(e) => {
+                e.dataTransfer.setData('targetSceneId', s.sceneId);
+                e.dataTransfer.effectAllowed = 'copy';
+              }}
+              onClick={() => {
+                if (s.sceneId !== currentSceneId && scenesRef.current[s.sceneId]) {
+                  scenesRef.current[s.sceneId].scene.switchTo({ transitionDuration: 800 });
+                  setCurrentSceneId(s.sceneId);
+                }
+              }}
+              style={{ width: '100%', height: '80px', borderRadius: '8px', overflow: 'hidden', border: s.sceneId === currentSceneId ? '2px solid #0078ff' : '2px solid transparent', cursor: s.sceneId === currentSceneId ? 'not-allowed' : 'grab', opacity: s.sceneId === currentSceneId ? 0.4 : 1, position: 'relative', flexShrink: 0, transition: 'transform 0.2s' }}
+              onMouseOver={(e) => { if(s.sceneId !== currentSceneId) e.currentTarget.style.transform = 'scale(1.05)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+            >
+              <img src={`/previews/${s.sceneId}.jpg`} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.src = '/logo.png'; }} />
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.9))', color: 'white', fontSize: '11px', textAlign: 'center', padding: '15px 2px 4px 2px', fontWeight: 'bold' }}>
+                {s.sceneId.split('_').pop()}
+              </div>
             </div>
           ))}
         </div>
