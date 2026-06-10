@@ -50,6 +50,21 @@ const getHotspotStyle = (type: string, customImageUrl?: string, opacity: number 
   }
 };
 
+// --- دالة رياضية جديدة لحساب الحجم بناءً على البعد الرأسي (Pitch) ---
+// pitch = 0 (الأفق) => أصغر حجم
+// pitch = -PI/2 (أسفل الكاميرا) => أكبر حجم
+const calculateScale = (pitch: number) => {
+  // أخذ القيمة المطلقة لتجنب الانعكاس، 0=الأفق (أبعد)، 1.57=رأسي (أقرب)
+  const absPitch = Math.abs(pitch);
+  const ratio = Math.min(1, absPitch / (Math.PI / 2));
+  
+  const minScale = 0.65; // حجم أصغر في الأفق (بعيد) لزيادة الواقعية
+  const maxScale = 2.5;  // حجم كبير أسفل الكاميرا
+
+  // منحنى تكبير أسي لجعل الانتقال طبيعياً
+  return minScale + (maxScale - minScale) * Math.pow(ratio, 1.8);
+};
+
 export default function MarzipanoViewer() {
   const viewerRef = useRef<HTMLDivElement>(null);
 
@@ -151,6 +166,10 @@ export default function MarzipanoViewer() {
         hotspotVisual.style.cursor = isEditMode ? 'grab' : 'pointer';
         hotspotVisual.title = label; // ضمان ظهور اسم الغرفة (Native Tooltip) كحل احتياطي قوي
 
+        // --- تطبيق الحجم المبدئي بناءً على زاوية الميل الأولية ---
+        const initialScale = calculateScale(hotspot.pitch);
+        hotspotVisual.style.setProperty('--depth-scale', initialScale.toString());
+
         // 1. حاوية النص التوضيحي
         const tooltip = document.createElement('div');
         tooltip.className = 'hs-tooltip';
@@ -219,6 +238,10 @@ export default function MarzipanoViewer() {
                 const rect = viewerElement.getBoundingClientRect();
                 const coords = view.screenToCoordinates({ x: moveEvent.clientX - rect.left, y: moveEvent.clientY - rect.top });
                 if (coords) hs.setPosition(coords);
+
+                // --- تطبيق التحجيم الديناميكي لحظة بلحظة أثناء السحب ---
+                const newScale = calculateScale(coords.pitch);
+                hotspotVisual.style.setProperty('--depth-scale', newScale.toString());
               }
             };
   
@@ -226,7 +249,6 @@ export default function MarzipanoViewer() {
               viewer.controls().enable();
               window.removeEventListener('mousemove', onMouseMove);
               window.removeEventListener('mouseup', onMouseUp);
-              hotspotVisual.style.cursor = 'grab';
               
               if (isDragging) {
                 const view = viewer.view();
@@ -234,6 +256,11 @@ export default function MarzipanoViewer() {
                 const rect = viewerElement.getBoundingClientRect();
                 const coords = view.screenToCoordinates({ x: upEvent.clientX - rect.left, y: upEvent.clientY - rect.top });
                 if (coords) {
+                  // --- إعادة تطبيق الحجم النهائي وتغيير شكل المؤشر ---
+                  const finalScale = calculateScale(coords.pitch);
+                  hotspotVisual.style.setProperty('--depth-scale', finalScale.toString());
+                  hotspotVisual.style.cursor = 'grab';
+
                   console.log(`📌 سهم الانتقال للمشهد [${hotspot.targetSceneId}] تم نقله!`);
                   
                   fetch('/api/update-hotspot', {
@@ -260,6 +287,7 @@ export default function MarzipanoViewer() {
                   .catch(err => console.error("❌ فشل الاتصال بالخادم للحفظ:", err));
                 }
               } else {
+                hotspotVisual.style.cursor = 'grab'; // إعادة المؤشر في حالة النقر العادي
                 const target = scenes[hotspot.targetSceneId];
                 if (target) {
                   // الحفاظ على اتجاه الرؤية عند الانتقال للمطور
@@ -439,11 +467,11 @@ export default function MarzipanoViewer() {
           display: flex;
           justify-content: center;
           align-items: center;
-          transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%) scale(var(--depth-scale, 1));
           transition: transform 0.2s ease-in-out;
         }
         .hotspot-visual:hover {
-          transform: translate(-50%, -50%) scale(1.15);
+          transform: translate(-50%, -50%) scale(calc(var(--depth-scale, 1) * 1.15));
           z-index: 9999;
         }
         .hs-tooltip {
