@@ -11,7 +11,10 @@
                     "yaw": -2.439201063822205,
                     "pitch": 0.1788351167552804,
                     "type": "ground-radar",
-                    "label": "إلى 239"
+                    "label": "إلى 239",
+                    "customImageUrl": "",
+                    "opacity": 1,
+                    "rotation": 0
                 },
                 {
                     "targetSceneId": "IMG_20260529_160041_00_243",
@@ -45,11 +48,11 @@
                     "targetSceneId": "IMG_20260529_160316_00_246",
                     "yaw": -2.7669316460251707,
                     "pitch": 0.025649458240586398,
-                    "type": "ground-radar",
+                    "type": "3d-arrow",
                     "label": "إلى 246",
                     "customImageUrl": "",
                     "opacity": 1,
-                    "rotation": 50
+                    "rotation": 270
                 }
             ]
         },
@@ -245,10 +248,20 @@
                 },
                 {
                     "targetSceneId": "IMG_20260529_160241_00_245",
-                    "yaw": -1.6000095289394274,
-                    "pitch": 0.3145030515664935,
+                    "yaw": -1.6222294060079605,
+                    "pitch": 0.30824144067483417,
                     "type": "ground-radar",
                     "label": "إلى 245"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155535_00_239",
+                    "yaw": -2.306009588147699,
+                    "pitch": 0.1725437805353458,
+                    "type": "3d-arrow",
+                    "label": "إلى 239",
+                    "customImageUrl": "",
+                    "opacity": 1,
+                    "rotation": 270
                 }
             ]
         },

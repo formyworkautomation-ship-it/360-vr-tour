@@ -81,6 +81,8 @@ export default function MarzipanoViewer() {
   const [editingSceneId, setEditingSceneId] = useState<string | null>(null);
   const [tempSceneName, setTempSceneName] = useState<string>('');
   const [projectData, setProjectData] = useState<any>(null);
+  const [menuPos, setMenuPos] = useState({ x: 50, y: 50 });
+  const lastUsedConfigRef = useRef({ type: 'ground-radar', customImageUrl: '', opacity: 1, rotation: 0 });
   const hotspotElementsRef = useRef<Record<string, Record<string, HTMLElement>>>({});
   const viewerInstanceRef = useRef<any>(null);
   const scenesRef = useRef<Record<string, any>>({});
@@ -114,6 +116,20 @@ export default function MarzipanoViewer() {
         .catch(err => console.error("Error fetching icons:", err));
     }
   }, [isEditMode]);
+
+  // --- استرجاع آخر إعدادات وموقع للقائمة من الذاكرة المحلية (الدخول الجديد) ---
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedConfig = localStorage.getItem('360_last_hotspot_config');
+      if (savedConfig) {
+        try { lastUsedConfigRef.current = JSON.parse(savedConfig); } catch (e) {}
+      }
+      const savedMenuPos = localStorage.getItem('360_last_menu_pos');
+      if (savedMenuPos) {
+        try { setMenuPos(JSON.parse(savedMenuPos)); } catch (e) {}
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const viewerElement = viewerRef.current;
@@ -435,6 +451,15 @@ export default function MarzipanoViewer() {
       editingHotspot.originalHotspotRef.targetSceneId = editingHotspot.newTargetSceneId;
     }
 
+    // حفظ الإعدادات كافتراضية للمرات القادمة
+    lastUsedConfigRef.current = {
+      type: editingHotspot.type,
+      customImageUrl: editingHotspot.customImageUrl || '',
+      opacity: editingHotspot.opacity,
+      rotation: editingHotspot.rotation || 0
+    };
+    localStorage.setItem('360_last_hotspot_config', JSON.stringify(lastUsedConfigRef.current));
+
     try {
       const res = await fetch('/api/update-hotspot', {
         method: 'POST',
@@ -517,7 +542,10 @@ export default function MarzipanoViewer() {
             targetSceneId: targetId,
             yaw: coords.yaw,
             pitch: coords.pitch,
-            type: 'ground-radar',
+            type: lastUsedConfigRef.current.type,
+            opacity: lastUsedConfigRef.current.opacity,
+            rotation: lastUsedConfigRef.current.rotation,
+            customImageUrl: lastUsedConfigRef.current.customImageUrl,
             label: `إلى ${targetId.split('_').pop()}`
           })
         });
@@ -527,7 +555,7 @@ export default function MarzipanoViewer() {
           const updatedData = JSON.parse(JSON.stringify(projectData));
           const sceneIndex = updatedData.scenes.findIndex((s: any) => s.sceneId === currentSceneId);
           if (sceneIndex !== -1) {
-            updatedData.scenes[sceneIndex].hotspots.push({ targetSceneId: targetId, yaw: coords.yaw, pitch: coords.pitch, type: 'ground-radar', label: `إلى ${targetId.split('_').pop()}` });
+            updatedData.scenes[sceneIndex].hotspots.push({ targetSceneId: targetId, yaw: coords.yaw, pitch: coords.pitch, type: lastUsedConfigRef.current.type, opacity: lastUsedConfigRef.current.opacity, rotation: lastUsedConfigRef.current.rotation, customImageUrl: lastUsedConfigRef.current.customImageUrl, label: `إلى ${targetId.split('_').pop()}` });
             setProjectData(updatedData); // إعادة التصيير لإظهار النقطة
           }
         }
@@ -751,9 +779,29 @@ export default function MarzipanoViewer() {
 
       {/* --- واجهة تحكم متقدمة لتخصيص النقطة التفاعلية تظهر فقط عند النقر الأيمن --- */}
       {isEditMode && editingHotspot && projectData && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(3px)' }}>
-          <div style={{ background: '#1e1e1e', padding: '24px', borderRadius: '12px', width: '360px', boxShadow: '0 10px 40px rgba(0,0,0,0.5)', color: 'white', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid #333', fontFamily: 'system-ui, sans-serif' }}>
-            <h3 style={{ margin: 0, borderBottom: '1px solid #333', paddingBottom: '12px', fontSize: '18px', textAlign: 'center' }}>تخصيص النقطة التفاعلية</h3>
+        <div style={{ position: 'fixed', top: menuPos.y, left: menuPos.x, zIndex: 9999 }}>
+          <div style={{ background: 'rgba(30,30,30,0.95)', padding: '24px', borderRadius: '12px', width: '360px', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', color: 'white', display: 'flex', flexDirection: 'column', gap: '16px', border: '1px solid #444', fontFamily: 'system-ui, sans-serif', backdropFilter: 'blur(10px)' }}>
+            <h3 
+              onMouseDown={(e) => {
+                const startX = e.clientX - menuPos.x;
+                const startY = e.clientY - menuPos.y;
+                const onMouseMove = (moveEvent: MouseEvent) => setMenuPos({ x: moveEvent.clientX - startX, y: moveEvent.clientY - startY });
+                const onMouseUp = () => { 
+                  window.removeEventListener('mousemove', onMouseMove); 
+                  window.removeEventListener('mouseup', onMouseUp); 
+                  setMenuPos(prev => {
+                    localStorage.setItem('360_last_menu_pos', JSON.stringify(prev));
+                    return prev;
+                  });
+                };
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+              }}
+              style={{ margin: 0, borderBottom: '1px solid #444', paddingBottom: '12px', fontSize: '18px', textAlign: 'center', cursor: 'move', userSelect: 'none', background: 'rgba(0,0,0,0.3)', borderRadius: '6px' }}
+              title="اسحب من هنا لتحريك القائمة"
+            >
+              تخصيص النقطة التفاعلية
+            </h3>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '60vh', overflowY: 'auto', paddingRight: '4px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -768,7 +816,11 @@ export default function MarzipanoViewer() {
                   ].map(shape => (
                     <button
                       key={shape.id}
-                      onClick={() => setEditingHotspot({...editingHotspot, type: shape.id, customImageUrl: ''})}
+                  onClick={() => {
+                    setEditingHotspot({...editingHotspot, type: shape.id, customImageUrl: ''});
+                    const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                    if (iconContainer) iconContainer.innerHTML = getHotspotStyle(shape.id, '', editingHotspot.opacity, editingHotspot.rotation);
+                  }}
                       style={{ padding: '8px', background: editingHotspot.type === shape.id && !editingHotspot.customImageUrl ? '#0078ff' : '#2a2a2a', color: 'white', border: '1px solid #444', borderRadius: '6px', cursor: 'pointer', fontSize: '13px', transition: 'background 0.2s' }}
                     >
                       {shape.label}
@@ -784,7 +836,11 @@ export default function MarzipanoViewer() {
                     {availableIcons.map(iconUrl => (
                       <div
                         key={iconUrl}
-                        onClick={() => setEditingHotspot({...editingHotspot, type: 'custom-image', customImageUrl: iconUrl})}
+                    onClick={() => {
+                      setEditingHotspot({...editingHotspot, type: 'custom-image', customImageUrl: iconUrl});
+                      const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                      if (iconContainer) iconContainer.innerHTML = getHotspotStyle('custom-image', iconUrl, editingHotspot.opacity, editingHotspot.rotation);
+                    }}
                         style={{ width: '48px', height: '48px', borderRadius: '6px', border: editingHotspot.customImageUrl === iconUrl ? '2px solid #0078ff' : '2px solid transparent', background: '#333', padding: '4px', cursor: 'pointer', transition: 'border 0.2s' }}
                         title={iconUrl.replace('/icons/', '')}
                       >
@@ -800,35 +856,83 @@ export default function MarzipanoViewer() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>شفافية الشكل (Opacity): {Math.round((editingHotspot.opacity || 1) * 100)}%</label>
-                <input
-                  type="range"
-                  min="0.1"
-                  max="1"
-                  step="0.1"
-                  value={editingHotspot.opacity || 1}
-                  onChange={(e) => setEditingHotspot({...editingHotspot, opacity: parseFloat(e.target.value)})}
-                  style={{ width: '100%', cursor: 'pointer' }}
-                />
+                <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>الشفافية (Opacity):</label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <input
+                    type="range" min="0.1" max="1" step="0.1"
+                    value={editingHotspot.opacity || 1}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      const newOp = isNaN(val) ? 1 : val;
+                      setEditingHotspot({...editingHotspot, opacity: newOp});
+                      const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                      if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, newOp, editingHotspot.rotation);
+                    }}
+                    style={{ flex: 1, cursor: 'pointer' }}
+                  />
+                  <input type="number" min="0.1" max="1" step="0.1" value={editingHotspot.opacity || 1}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      const newOp = isNaN(val) ? 1 : val;
+                      setEditingHotspot({...editingHotspot, opacity: newOp});
+                      const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                      if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, newOp, editingHotspot.rotation);
+                    }}
+                    style={{ width: '60px', padding: '4px', background: '#333', color: 'white', border: '1px solid #555', borderRadius: '4px', textAlign: 'center' }}
+                  />
+                </div>
               </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-            <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>اتجاه السهم (Rotation): {editingHotspot.rotation || 0}°</label>
-            <input
-              type="range"
-              min="0"
-              max="360"
-              step="5"
-              value={editingHotspot.rotation || 0}
-              onChange={(e) => {
-                const newRot = parseInt(e.target.value);
-                setEditingHotspot({...editingHotspot, rotation: newRot});
-                const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
-                if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity, newRot);
-              }}
-              style={{ width: '100%', cursor: 'pointer' }}
-            />
-          </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>اتجاه السهم (Rotation):</label>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div 
+                    onMouseDown={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const centerX = rect.left + rect.width / 2;
+                      const centerY = rect.top + rect.height / 2;
+                      const onMouseMove = (moveEvent: MouseEvent) => {
+                        const dx = moveEvent.clientX - centerX;
+                        const dy = moveEvent.clientY - centerY;
+                        let angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+                        if (angle < 0) angle += 360;
+                        const newRot = Math.round(angle);
+                        setEditingHotspot(prev => ({...prev, rotation: newRot}));
+                        const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                        if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity, newRot);
+                      };
+                      const onMouseUp = () => { window.removeEventListener('mousemove', onMouseMove); window.removeEventListener('mouseup', onMouseUp); };
+                      window.addEventListener('mousemove', onMouseMove);
+                      window.addEventListener('mouseup', onMouseUp);
+                    }}
+                    style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#222', border: '2px solid #555', position: 'relative', cursor: 'grab', boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)', flexShrink: 0 }}
+                    title="اسحب الدائرة لتغيير الاتجاه"
+                  >
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', width: '2px', height: '18px', background: '#00ffcc', transformOrigin: 'top center', transform: `rotate(${editingHotspot.rotation || 0}deg) translate(-50%, -100%)`, borderRadius: '2px' }}></div>
+                    <div style={{ position: 'absolute', top: '50%', left: '50%', width: '6px', height: '6px', background: 'white', borderRadius: '50%', transform: 'translate(-50%, -50%)' }}></div>
+                  </div>
+                  <input type="range" min="0" max="360" step="1" value={editingHotspot.rotation || 0}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      const newRot = isNaN(val) ? 0 : val;
+                      setEditingHotspot({...editingHotspot, rotation: newRot});
+                      const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                      if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity, newRot);
+                    }}
+                    style={{ flex: 1, cursor: 'pointer' }}
+                  />
+                  <input type="number" min="0" max="360" step="1" value={editingHotspot.rotation || 0}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      const newRot = isNaN(val) ? 0 : val;
+                      setEditingHotspot({...editingHotspot, rotation: newRot});
+                      const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                      if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity, newRot);
+                    }}
+                    style={{ width: '55px', padding: '4px', background: '#333', color: 'white', border: '1px solid #555', borderRadius: '4px', textAlign: 'center' }}
+                  />
+                </div>
+              </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
             <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>اسم الغرفة (يظهر عند الوقوف بالماوس):</label>
@@ -845,7 +949,19 @@ export default function MarzipanoViewer() {
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
               <button onClick={handleSaveEdit} style={{ flex: 1, padding: '12px', background: '#0078ff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#0066cc'} onMouseOut={e => e.currentTarget.style.background = '#0078ff'}>حفظ وتطبيق</button>
               <button onClick={handleDeleteHotspot} style={{ flex: 1, padding: '12px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#c0392b'} onMouseOut={e => e.currentTarget.style.background = '#e74c3c'}>حذف النقطة</button>
-              <button onClick={() => setEditingHotspot(null)} style={{ flex: 1, padding: '12px', background: 'transparent', color: '#ccc', border: '1px solid #555', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#333'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>إلغاء</button>
+              <button onClick={() => {
+                // التراجع عن التغييرات الحية في واجهة المتصفح إذا تم ضغط إلغاء
+                const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                if (iconContainer) {
+                  iconContainer.innerHTML = getHotspotStyle(
+                    editingHotspot.originalHotspotRef.type || 'ground-radar',
+                    editingHotspot.originalHotspotRef.customImageUrl || '',
+                    editingHotspot.originalHotspotRef.opacity ?? 1,
+                    editingHotspot.originalHotspotRef.rotation || 0
+                  );
+                }
+                setEditingHotspot(null);
+              }} style={{ flex: 1, padding: '12px', background: 'transparent', color: '#ccc', border: '1px solid #555', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#333'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>إلغاء</button>
             </div>
           </div>
 
