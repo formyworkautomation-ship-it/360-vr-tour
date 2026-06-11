@@ -8,24 +8,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { sourceSceneId, targetSceneId, yaw, pitch, type, label } = await request.json();
-    
+    const { sceneId, newName } = await request.json();
     const filePath = path.join(process.cwd(), 'public', 'data', 'final_project_data.json');
     const fileData = await fs.readFile(filePath, 'utf-8');
     const projectData = JSON.parse(fileData);
 
-    const sceneToUpdate = projectData.scenes.find((s: any) => s.sceneId === sourceSceneId);
-    
-    if (sceneToUpdate) {
-      // تم إلغاء شرط منع التكرار للسماح بوضع أكثر من نقطة تؤدي لنفس المشهد
-      sceneToUpdate.hotspots.push({
-        targetSceneId,
-        yaw,
-        pitch,
-        type: type || 'ground-radar',
-        label: label || ''
-      });
-    }
+    const sceneToUpdate = projectData.scenes.find((s: any) => s.sceneId === sceneId);
+    if (sceneToUpdate) sceneToUpdate.name = newName;
 
     await fs.writeFile(filePath, JSON.stringify(projectData, null, 4), 'utf-8');
     return NextResponse.json({ success: true });

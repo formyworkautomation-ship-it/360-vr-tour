@@ -8,7 +8,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { sourceSceneId, targetSceneId, yaw, pitch, type, label } = await request.json();
+    // استقبال الإحداثيات لضمان مسح النقطة المحددة فقط
+    const { sourceSceneId, targetSceneId, yaw, pitch } = await request.json();
     
     const filePath = path.join(process.cwd(), 'public', 'data', 'final_project_data.json');
     const fileData = await fs.readFile(filePath, 'utf-8');
@@ -17,14 +18,8 @@ export async function POST(request: Request) {
     const sceneToUpdate = projectData.scenes.find((s: any) => s.sceneId === sourceSceneId);
     
     if (sceneToUpdate) {
-      // تم إلغاء شرط منع التكرار للسماح بوضع أكثر من نقطة تؤدي لنفس المشهد
-      sceneToUpdate.hotspots.push({
-        targetSceneId,
-        yaw,
-        pitch,
-        type: type || 'ground-radar',
-        label: label || ''
-      });
+      // الفلترة باستخدام الوجهة + الإحداثيات لعدم حذف النقاط المشابهة
+      sceneToUpdate.hotspots = sceneToUpdate.hotspots.filter((h: any) => !(h.targetSceneId === targetSceneId && h.yaw === yaw && h.pitch === pitch));
     }
 
     await fs.writeFile(filePath, JSON.stringify(projectData, null, 4), 'utf-8');

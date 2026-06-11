@@ -72,6 +72,8 @@ export default function MarzipanoViewer() {
   const [editingHotspot, setEditingHotspot] = useState<any>(null);
   const [availableIcons, setAvailableIcons] = useState<string[]>([]);
   const [currentSceneId, setCurrentSceneId] = useState<string>('');
+  const [editingSceneId, setEditingSceneId] = useState<string | null>(null);
+  const [tempSceneName, setTempSceneName] = useState<string>('');
   const [projectData, setProjectData] = useState<any>(null);
   const hotspotElementsRef = useRef<Record<string, Record<string, HTMLElement>>>({});
   const viewerInstanceRef = useRef<any>(null);
@@ -207,6 +209,8 @@ export default function MarzipanoViewer() {
             setEditingHotspot({
               sourceSceneId: sceneData.sceneId,
               targetSceneId: hotspot.targetSceneId,
+                  yaw: hotspot.yaw,
+                  pitch: hotspot.pitch,
               type: type,
               customImageUrl: hotspot.customImageUrl || '',
               opacity: opacity,
@@ -341,15 +345,55 @@ export default function MarzipanoViewer() {
     });
 
     if (projectData.scenes.length > 0) {
-      const firstSceneId = projectData.scenes[0].sceneId;
-      scenes[firstSceneId].scene.switchTo();
-      setCurrentSceneId(firstSceneId);
+      // إصلاح القفز الإجباري: ابق في المشهد الحالي بعد التحديث، أو اذهب للأول عند التحميل المبدئي
+      const sceneToLoad = currentSceneId && scenes[currentSceneId] 
+        ? currentSceneId 
+        : projectData.scenes[0].sceneId;
+      scenes[sceneToLoad].scene.switchTo();
+      setCurrentSceneId(sceneToLoad);
     }
 
     return () => {
       viewer.destroy();
     };
   }, [projectData, isEditMode]);
+
+  // --- منطق حذف النقطة التفاعلية ---
+  const handleDeleteHotspot = async () => {
+    if (!editingHotspot) return;
+    
+    // إخفاء العنصر بصرياً فقط لتجنب تعارض الـ DOM مع محرك Marzipano عند تدمير المشهد
+    const wrapper = editingHotspot.domElement.parentElement;
+    if (wrapper) {
+      wrapper.style.display = 'none';
+    }
+
+    try {
+      const res = await fetch('/api/delete-hotspot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sourceSceneId: editingHotspot.sourceSceneId,
+          targetSceneId: editingHotspot.targetSceneId,
+          yaw: editingHotspot.yaw,
+          pitch: editingHotspot.pitch
+        })
+      });
+      
+      if (res.ok) {
+        const updatedData = JSON.parse(JSON.stringify(projectData));
+        const scene = updatedData.scenes.find((s: any) => s.sceneId === editingHotspot.sourceSceneId);
+        if (scene) {
+          scene.hotspots = scene.hotspots.filter((h: any) => !(h.targetSceneId === editingHotspot.targetSceneId && h.yaw === editingHotspot.yaw && h.pitch === editingHotspot.pitch));
+          setProjectData(updatedData);
+        }
+      }
+    } catch (e) {
+      console.error("❌ حدث خطأ أثناء الحذف:", e);
+    }
+    
+    setEditingHotspot(null);
+  };
 
   // دالة حفظ التغييرات من لوحة التحكم
   const handleSaveEdit = async () => {
@@ -398,6 +442,30 @@ export default function MarzipanoViewer() {
       console.error("❌ حدث خطأ أثناء الحفظ:", e);
     }
     setEditingHotspot(null);
+  };
+
+  // --- منطق حفظ الاسم العام للمشهد ---
+  const handleSaveSceneName = async (sceneId: string) => {
+    if (!tempSceneName.trim()) {
+      setEditingSceneId(null);
+      return;
+    }
+    try {
+      const res = await fetch('/api/update-scene-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sceneId, newName: tempSceneName })
+      });
+      if (res.ok) {
+        const updatedData = JSON.parse(JSON.stringify(projectData));
+        const scene = updatedData.scenes.find((s: any) => s.sceneId === sceneId);
+        if (scene) scene.name = tempSceneName;
+        setProjectData(updatedData);
+      }
+    } catch (e) {
+      console.error("❌ فشل حفظ اسم المشهد:", e);
+    }
+    setEditingSceneId(null);
   };
 
   // --- منطق منصة البناء: استقبال الصورة المسحوبة وتحويلها لنقطة ساخنة ---
@@ -579,65 +647,52 @@ export default function MarzipanoViewer() {
         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#00ffcc', fontSize: '20px', zIndex: 10 }}>جاري جلب البيانات الحية...</div>
       )}
 
-      {/* --- لوحة المستكشف الجانبية (نُقلت لليسار لتوسيع المجال للشريط الأيمن) --- */}
-      {isEditMode && currentSceneId && projectData && (
-        <div style={{ position: 'absolute', top: 20, left: 20, width: 280, background: 'rgba(20,20,20,0.95)', padding: '16px', borderRadius: '12px', color: 'white', zIndex: 1000, border: '1px solid #333', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', fontFamily: 'system-ui, sans-serif' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '12px', fontSize: '16px', borderBottom: '1px solid #444', paddingBottom: '8px' }}>📍 إدارة نقاط المشهد الحالي</h3>
-          {projectData.scenes.find(s => s.sceneId === currentSceneId)?.hotspots.map((hs: any, idx: number) => (
-            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', background: '#2a2a2a', padding: '10px', borderRadius: '6px', border: '1px solid #444' }}>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>وجهة: {hs.targetSceneId.split('_').pop()}</span>
-                <span style={{ fontSize: '11px', color: '#aaa' }}>{hs.label || 'بدون اسم'}</span>
-              </div>
-              <button 
-                onClick={() => {
-                  const visualElement = hotspotElementsRef.current[currentSceneId]?.[hs.targetSceneId];
-                  setEditingHotspot({
-                    sourceSceneId: currentSceneId,
-                    targetSceneId: hs.targetSceneId,
-                    type: hs.type || 'ground-radar',
-                    customImageUrl: hs.customImageUrl || '',
-                    opacity: hs.opacity !== undefined ? hs.opacity : 1,
-                    label: hs.label || '',
-                    domElement: visualElement,
-                    originalHotspotRef: hs
-                  });
-                }}
-                style={{ background: '#0078ff', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
-              >تعديل</button>
-            </div>
-          ))}
-        </div>
-      )}
-
       {/* --- منصة البناء (شريط الصور المصغرة الجانبي الأيمن) --- */}
       {isEditMode && projectData && (
         <div className="custom-scrollbar" style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: '130px', display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(10,10,10,0.85)', padding: '16px 12px', overflowY: 'auto', overflowX: 'hidden', zIndex: 1000, borderLeft: '1px solid #333', backdropFilter: 'blur(10px)' }}>
           <style>{`.custom-scrollbar::-webkit-scrollbar { width: 6px; } .custom-scrollbar::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }`}</style>
-          {projectData.scenes.map((s: any) => (
-            <div
-              key={s.sceneId}
-              draggable={s.sceneId !== currentSceneId}
-              onDragStart={(e) => {
-                e.dataTransfer.setData('targetSceneId', s.sceneId);
-                e.dataTransfer.effectAllowed = 'copy';
-              }}
-              onClick={() => {
-                if (s.sceneId !== currentSceneId && scenesRef.current[s.sceneId]) {
-                  scenesRef.current[s.sceneId].scene.switchTo({ transitionDuration: 800 });
-                  setCurrentSceneId(s.sceneId);
-                }
-              }}
-              style={{ width: '100%', height: '80px', borderRadius: '8px', overflow: 'hidden', border: s.sceneId === currentSceneId ? '2px solid #0078ff' : '2px solid transparent', cursor: s.sceneId === currentSceneId ? 'not-allowed' : 'grab', opacity: s.sceneId === currentSceneId ? 0.4 : 1, position: 'relative', flexShrink: 0, transition: 'transform 0.2s' }}
-              onMouseOver={(e) => { if(s.sceneId !== currentSceneId) e.currentTarget.style.transform = 'scale(1.05)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
-            >
-              <img src={`/previews/${s.sceneId}.jpg`} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.currentTarget.src = '/logo.png'; }} />
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(transparent, rgba(0,0,0,0.9))', color: 'white', fontSize: '11px', textAlign: 'center', padding: '15px 2px 4px 2px', fontWeight: 'bold' }}>
-                {s.sceneId.split('_').pop()}
+          {projectData.scenes.map((s: any) => {
+            const isActive = s.sceneId === currentSceneId;
+            return (
+              <div
+                key={s.sceneId}
+                draggable={!isActive}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('targetSceneId', s.sceneId);
+                  e.dataTransfer.effectAllowed = 'copy';
+                }}
+                onClick={() => {
+                  if (!isActive && scenesRef.current[s.sceneId]) {
+                    scenesRef.current[s.sceneId].scene.switchTo({ transitionDuration: 800 });
+                    setCurrentSceneId(s.sceneId);
+                  }
+                }}
+                style={{ width: '100%', height: '80px', borderRadius: '8px', overflow: 'hidden', border: isActive ? '2px solid #00ffcc' : '2px solid transparent', boxShadow: isActive ? '0 0 12px rgba(0, 255, 204, 0.5)' : 'none', cursor: isActive ? 'default' : 'grab', opacity: 1, position: 'relative', flexShrink: 0, transition: 'all 0.3s ease' }}
+                onMouseOver={(e) => { if(!isActive) e.currentTarget.style.transform = 'scale(1.05)'; }}
+                onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+              >
+                <img src={`/previews/${s.sceneId}.jpg`} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', filter: isActive ? 'brightness(1.1)' : 'brightness(0.8)' }} onError={(e) => { e.currentTarget.src = '/logo.png'; }} />
+                
+                {isActive && (
+                  <div style={{ position: 'absolute', top: '4px', right: '4px', background: '#00ffcc', color: '#000', fontSize: '10px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <div style={{ width: '6px', height: '6px', background: '#000', borderRadius: '50%', animation: 'pulse-animation 1s infinite' }}></div>
+                      موقعك
+                  </div>
+                )}
+
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: isActive ? 'linear-gradient(transparent, rgba(0, 255, 204, 0.3), rgba(0,0,0,0.9))' : 'linear-gradient(transparent, rgba(0,0,0,0.9))', color: isActive ? '#00ffcc' : 'white', fontSize: '11px', textAlign: 'center', padding: '15px 2px 4px 2px', fontWeight: 'bold' }}>
+                  {editingSceneId === s.sceneId ? (
+                    <input autoFocus type="text" value={tempSceneName} onChange={(e) => setTempSceneName(e.target.value)} onBlur={() => handleSaveSceneName(s.sceneId)} onKeyDown={(e) => { if (e.key === 'Enter') handleSaveSceneName(s.sceneId); }} style={{ width: '90%', background: 'rgba(0,0,0,0.7)', color: '#00ffcc', border: '1px solid #00ffcc', borderRadius: '4px', textAlign: 'center', outline: 'none', fontSize: '11px', padding: '2px' }} />
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                      <span>{s.name || s.sceneId.split('_').pop()}</span>
+                      <span onClick={(e) => { e.stopPropagation(); setTempSceneName(s.name || s.sceneId.split('_').pop()); setEditingSceneId(s.sceneId); }} style={{ cursor: 'pointer', opacity: 0.7, padding: '2px' }} title="إعادة تسمية المشهد">✏️</span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -717,6 +772,7 @@ export default function MarzipanoViewer() {
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
               <button onClick={handleSaveEdit} style={{ flex: 1, padding: '12px', background: '#0078ff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#0066cc'} onMouseOut={e => e.currentTarget.style.background = '#0078ff'}>حفظ وتطبيق</button>
+              <button onClick={handleDeleteHotspot} style={{ flex: 1, padding: '12px', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#c0392b'} onMouseOut={e => e.currentTarget.style.background = '#e74c3c'}>حذف النقطة</button>
               <button onClick={() => setEditingHotspot(null)} style={{ flex: 1, padding: '12px', background: 'transparent', color: '#ccc', border: '1px solid #555', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#333'} onMouseOut={e => e.currentTarget.style.background = 'transparent'}>إلغاء</button>
             </div>
           </div>
@@ -730,7 +786,7 @@ export default function MarzipanoViewer() {
             >
               {projectData.scenes.map(s => (
                 <option key={s.sceneId} value={s.sceneId}>
-                  المشهد {s.sceneId.split('_').pop()}
+                  {s.name || `المشهد ${s.sceneId.split('_').pop()}`}
                 </option>
               ))}
             </select>

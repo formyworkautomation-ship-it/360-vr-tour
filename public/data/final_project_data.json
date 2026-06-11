@@ -8,17 +8,10 @@
             "hotspots": [
                 {
                     "targetSceneId": "IMG_20260529_155535_00_239",
-                    "yaw": -2.4342267407135996,
-                    "pitch": 0.18654699548834763,
+                    "yaw": -2.439201063822205,
+                    "pitch": 0.1788351167552804,
                     "type": "ground-radar",
                     "label": "إلى 239"
-                },
-                {
-                    "targetSceneId": "IMG_20260529_155631_00_240",
-                    "yaw": -2.4609287739050814,
-                    "pitch": 0.045405226819070776,
-                    "type": "ground-radar",
-                    "label": "إلى 240"
                 },
                 {
                     "targetSceneId": "IMG_20260529_160041_00_243",
@@ -29,10 +22,24 @@
                 },
                 {
                     "targetSceneId": "IMG_20260529_160144_00_244",
-                    "yaw": 2.2507929666369515,
-                    "pitch": 0.09491049989854616,
+                    "yaw": 2.251354824056289,
+                    "pitch": 0.07990644431542471,
                     "type": "ground-radar",
                     "label": "إلى 244"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160241_00_245",
+                    "yaw": 3.0604361261776365,
+                    "pitch": 0.1487163057942702,
+                    "type": "ground-radar",
+                    "label": "إلى 245"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155631_00_240",
+                    "yaw": -2.474753940907414,
+                    "pitch": 0.0490478502014593,
+                    "type": "ground-radar",
+                    "label": "إلى 240"
                 }
             ]
         },
@@ -66,15 +73,15 @@
             "hotspots": [
                 {
                     "targetSceneId": "IMG_20260529_155451_00_238",
-                    "yaw": -1.3269873552528448,
-                    "pitch": 0.0318055976814513,
+                    "yaw": -1.3402798061997636,
+                    "pitch": 0.04759153522931214,
                     "type": "ground-radar",
                     "label": "إلى 238"
                 },
                 {
                     "targetSceneId": "IMG_20260529_155535_00_239",
-                    "yaw": -1.328716768184183,
-                    "pitch": 0.08495656460537049,
+                    "yaw": -1.331386891659701,
+                    "pitch": 0.08311334143682991,
                     "type": "ground-radar",
                     "label": "إلى 239"
                 },
@@ -99,14 +106,44 @@
             "northOffset": 1.8539,
             "initialYaw": -0.1381,
             "initialPitch": 0.0229,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155631_00_240",
+                    "yaw": -1.6388205926093917,
+                    "pitch": 0.09003648961098243,
+                    "type": "ground-radar",
+                    "label": "إلى 240"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155856_00_242",
+                    "yaw": 1.4372631664593687,
+                    "pitch": 0.047028104681956506,
+                    "type": "ground-radar",
+                    "label": "إلى 242"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_155856_00_242",
             "northOffset": -0.0021,
             "initialYaw": 0.8691,
             "initialPitch": 0.0832,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155730_00_241",
+                    "yaw": 0.013865176568405246,
+                    "pitch": 0.07560191701895036,
+                    "type": "ground-radar",
+                    "label": "إلى 241"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155631_00_240",
+                    "yaw": 0.012768666141989016,
+                    "pitch": 0.04004027451824932,
+                    "type": "ground-radar",
+                    "label": "إلى 240"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160041_00_243",
@@ -116,12 +153,20 @@
             "hotspots": [
                 {
                     "targetSceneId": "IMG_20260529_160144_00_244",
-                    "yaw": 0.1560256705287344,
-                    "pitch": 0.09987525334143399,
+                    "yaw": 0.16573432457231085,
+                    "pitch": 0.11149299932522894,
                     "type": "ground-radar",
                     "label": "إلى 244"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_155451_00_238",
+                    "yaw": 0.1911059961723378,
+                    "pitch": 0.060190311322084966,
+                    "type": "ground-radar",
+                    "label": "إلى 238"
                 }
-            ]
+            ],
+            "name": "243"
         },
         {
             "sceneId": "IMG_20260529_160144_00_244",
@@ -131,75 +176,233 @@
             "hotspots": [
                 {
                     "targetSceneId": "IMG_20260529_155451_00_238",
-                    "yaw": 1.555746399445379,
-                    "pitch": 0.09357797894879027,
+                    "yaw": 1.5607426768713193,
+                    "pitch": 0.10745903451238448,
                     "type": "ground-radar",
                     "label": "إلى 238"
                 },
                 {
                     "targetSceneId": "IMG_20260529_160041_00_243",
-                    "yaw": -1.6193095185108977,
-                    "pitch": 0.07854842278103469,
+                    "yaw": -1.645936894002542,
+                    "pitch": 0.08701863793804776,
                     "type": "ground-radar",
                     "label": "إلى 243"
                 }
-            ]
+            ],
+            "name": "244"
         },
         {
             "sceneId": "IMG_20260529_160241_00_245",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_155451_00_238",
+                    "yaw": -2.358089075787813,
+                    "pitch": 0.32769560055016633,
+                    "type": "ground-radar",
+                    "label": "إلى 238"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160316_00_246",
+                    "yaw": 1.4767187222995952,
+                    "pitch": 0.2868787933204153,
+                    "type": "ground-radar",
+                    "label": "إلى 246"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160359_00_247",
+                    "yaw": 1.4319709380908296,
+                    "pitch": 0.1652364858813158,
+                    "type": "ground-radar",
+                    "label": "إلى 247"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160316_00_246",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160359_00_247",
+                    "yaw": 1.4448015106711152,
+                    "pitch": 0.32306483167744204,
+                    "type": "ground-radar",
+                    "label": "إلى 247"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160241_00_245",
+                    "yaw": -1.6000095289394274,
+                    "pitch": 0.3145030515664935,
+                    "type": "ground-radar",
+                    "label": "إلى 245"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160359_00_247",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160316_00_246",
+                    "yaw": -1.7358243676133203,
+                    "pitch": 0.3126030260730701,
+                    "type": "ground-radar",
+                    "label": "إلى 246"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160241_00_245",
+                    "yaw": -1.7096328984773148,
+                    "pitch": 0.15833354030380953,
+                    "type": "ground-radar",
+                    "label": "إلى 245"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160440_00_248",
+                    "yaw": 0.19850762318383097,
+                    "pitch": 0.3012005759048044,
+                    "type": "ground-radar",
+                    "label": "إلى 248"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160622_00_249mod",
+                    "yaw": -0.05064296012139913,
+                    "pitch": 0.09606278997181583,
+                    "type": "ground-radar",
+                    "label": "إلى 249mod"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_161003_00_252mod",
+                    "yaw": 1.194543257768336,
+                    "pitch": 0.26624707985346596,
+                    "type": "ground-radar",
+                    "label": "إلى 252mod"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160440_00_248",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160622_00_249mod",
+                    "yaw": 1.2599736916492095,
+                    "pitch": 0.1858406252935758,
+                    "type": "ground-radar",
+                    "label": "إلى 249mod"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160359_00_247",
+                    "yaw": -1.4622651075760853,
+                    "pitch": 0.2624893064775691,
+                    "type": "ground-radar",
+                    "label": "إلى 247"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160622_00_249mod",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160440_00_248",
+                    "yaw": -1.6251366549832067,
+                    "pitch": 0.16160880881668227,
+                    "type": "ground-radar",
+                    "label": "إلى 248",
+                    "customImageUrl": "",
+                    "opacity": 1
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160359_00_247",
+                    "yaw": -1.6050020259299735,
+                    "pitch": 0.11547741143600909,
+                    "type": "ground-radar",
+                    "label": "إلى 247"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160901_00_251",
+                    "yaw": -1.0234593219584696,
+                    "pitch": 0.2538825995596561,
+                    "type": "ground-radar",
+                    "label": "إلى 251"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160733_00_250",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160901_00_251",
+                    "yaw": -2.9496763218938398,
+                    "pitch": 0.04251424996974862,
+                    "type": "ground-radar",
+                    "label": "إلى 251"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_160901_00_251",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160622_00_249mod",
+                    "yaw": -0.570897317306077,
+                    "pitch": 0.3972203461278525,
+                    "type": "ground-radar",
+                    "label": "إلى 249mod"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160733_00_250",
+                    "yaw": -0.8933526485644965,
+                    "pitch": 0.11188534786563764,
+                    "type": "ground-radar",
+                    "label": "إلى 250"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_161003_00_252mod",
             "northOffset": 0,
             "initialYaw": 0,
             "initialPitch": 0,
-            "hotspots": []
+            "hotspots": [
+                {
+                    "targetSceneId": "IMG_20260529_160359_00_247",
+                    "yaw": -1.822795203754513,
+                    "pitch": 0.29811776315623817,
+                    "type": "ground-radar",
+                    "label": "إلى 247"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160316_00_246",
+                    "yaw": -1.8194469351007605,
+                    "pitch": 0.17936256574346032,
+                    "type": "ground-radar",
+                    "label": "إلى 246"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160241_00_245",
+                    "yaw": -1.7935212209812654,
+                    "pitch": 0.12277525522103261,
+                    "type": "ground-radar",
+                    "label": "إلى 245"
+                }
+            ]
         },
         {
             "sceneId": "IMG_20260529_161043_00_253mod",
