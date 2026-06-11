@@ -1,43 +1,40 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
 export async function POST(request: Request) {
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    // استقبال البيانات (الإحداثيات الجديدة) من المتصفح
-    const { sourceSceneId, targetSceneId, newTargetSceneId, yaw, pitch, type, customImageUrl, opacity, label } = await request.json();
-
-    // تحديد مسار ملف JSON الخاص بالمشروع
+    const { sourceSceneId, targetSceneId, yaw, pitch, newYaw, newPitch, newTargetSceneId, type, customImageUrl, opacity, label, rotation } = await request.json();
+    
     const filePath = path.join(process.cwd(), 'public', 'data', 'final_project_data.json');
+    const fileData = await fs.readFile(filePath, 'utf-8');
+    const projectData = JSON.parse(fileData);
 
-    // قراءة محتوى الملف الحالي
-    const fileData = fs.readFileSync(filePath, 'utf8');
-    const data = JSON.parse(fileData);
-
-    // البحث عن المشهد والنقطة المطلوبة لتحديثهما
-    const sceneIndex = data.scenes.findIndex((s: any) => s.sceneId === sourceSceneId);
-    if (sceneIndex > -1) {
-      const hotspotIndex = data.scenes[sceneIndex].hotspots.findIndex((h: any) => h.targetSceneId === targetSceneId);
+    const sceneToUpdate = projectData.scenes.find((s: any) => s.sceneId === sourceSceneId);
+    
+    if (sceneToUpdate) {
+      // البحث عن النقطة المحددة بدقة باستخدام الإحداثيات القديمة لضمان عدم الخطأ
+      const hotspot = sceneToUpdate.hotspots.find((h: any) => h.targetSceneId === targetSceneId && h.yaw === yaw && h.pitch === pitch);
       
-      if (hotspotIndex > -1) {
-        // تحديث الإحداثيات
-        if (yaw !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].yaw = yaw;
-        if (pitch !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].pitch = pitch;
-        if (type !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].type = type;
-        if (customImageUrl !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].customImageUrl = customImageUrl;
-        if (opacity !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].opacity = opacity;
-        if (label !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].label = label;
-        if (newTargetSceneId !== undefined) data.scenes[sceneIndex].hotspots[hotspotIndex].targetSceneId = newTargetSceneId;
-
-        // حفظ الملف مرة أخرى
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-        return NextResponse.json({ success: true });
+      if (hotspot) {
+        if (newYaw !== undefined) hotspot.yaw = newYaw;
+        if (newPitch !== undefined) hotspot.pitch = newPitch;
+        if (newTargetSceneId !== undefined) hotspot.targetSceneId = newTargetSceneId;
+        if (type !== undefined) hotspot.type = type;
+        if (customImageUrl !== undefined) hotspot.customImageUrl = customImageUrl;
+        if (opacity !== undefined) hotspot.opacity = opacity;
+        if (label !== undefined) hotspot.label = label;
+        if (rotation !== undefined) hotspot.rotation = rotation;
       }
     }
 
-    return NextResponse.json({ success: false, error: 'Hotspot not found' }, { status: 404 });
+    await fs.writeFile(filePath, JSON.stringify(projectData, null, 4), 'utf-8');
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating hotspot:', error);
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
   }
 }

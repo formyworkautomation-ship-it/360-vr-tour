@@ -40,6 +40,16 @@
                     "pitch": 0.0490478502014593,
                     "type": "ground-radar",
                     "label": "إلى 240"
+                },
+                {
+                    "targetSceneId": "IMG_20260529_160316_00_246",
+                    "yaw": -2.7669316460251707,
+                    "pitch": 0.025649458240586398,
+                    "type": "ground-radar",
+                    "label": "إلى 246",
+                    "customImageUrl": "",
+                    "opacity": 1,
+                    "rotation": 50
                 }
             ]
         },
@@ -206,8 +216,8 @@
                 },
                 {
                     "targetSceneId": "IMG_20260529_160316_00_246",
-                    "yaw": 1.4767187222995952,
-                    "pitch": 0.2868787933204153,
+                    "yaw": 1.4616528911859312,
+                    "pitch": 0.2898318443099921,
                     "type": "ground-radar",
                     "label": "إلى 246"
                 },

@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import Marzipano from 'marzipano';
 
 // دالة لتوليد أشكال مختلفة من النقاط الساخنة (نُقلت للخارج لتستخدمها واجهة التعديل)
-const getHotspotStyle = (type: string, customImageUrl?: string, opacity: number = 1) => {
+const getHotspotStyle = (type: string, customImageUrl?: string, opacity: number = 1, rotation: number = 0) => {
   if (type === 'custom-image' && customImageUrl) {
     return `
-      <div style="position: relative; width: 55px; height: 55px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 15px rgba(255,255,255,0.15); border: 2px solid white; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: ${opacity};">
+      <div style="position: relative; width: 55px; height: 55px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 15px rgba(255,255,255,0.15); border: 2px solid white; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; opacity: ${opacity}; transform: rotate(${rotation}deg); transition: transform 0.2s;">
         <img src="${customImageUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'" />
       </div>
     `;
@@ -35,10 +35,16 @@ const getHotspotStyle = (type: string, customImageUrl?: string, opacity: number 
           <div class="pulse"></div>
         </div>
       `;
+    case '3d-arrow':
+      return `
+        <div class="hs-3d-arrow" style="opacity: ${opacity}; transform: rotate(${rotation}deg); transition: transform 0.2s;">
+          <div class="arrow-body"></div>
+        </div>
+      `;
     case 'arrow':
     default:
       return `
-        <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; opacity: ${opacity};">
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; opacity: ${opacity}; transform: rotate(${rotation}deg); transition: transform 0.2s;">
           <div style="position: absolute; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.5); border-radius: 50%; animation: pulse-animation 2s infinite;"></div>
           <div style="position: relative; background: rgba(0,0,0,0.6); width: 36px; height: 36px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -164,6 +170,7 @@ export default function MarzipanoViewer() {
         const distance = hotspot.distance || 3.0;
         const type = hotspot.type || 'ground-radar';
         const opacity = hotspot.opacity !== undefined ? hotspot.opacity : 1;
+        const rotation = hotspot.rotation || 0;
         const label = hotspot.label || '';
 
         hotspotWrapper.style.zIndex = Math.round(1000 - distance).toString();
@@ -189,7 +196,7 @@ export default function MarzipanoViewer() {
         // 2. حاوية الأيقونة أو الشكل المختار
         const iconContainer = document.createElement('div');
         iconContainer.className = 'hs-icon-container';
-        iconContainer.innerHTML = getHotspotStyle(type, hotspot.customImageUrl, opacity);
+        iconContainer.innerHTML = getHotspotStyle(type, hotspot.customImageUrl, opacity, rotation);
         
         hotspotVisual.appendChild(tooltip);
         hotspotVisual.appendChild(iconContainer);
@@ -214,6 +221,7 @@ export default function MarzipanoViewer() {
               type: type,
               customImageUrl: hotspot.customImageUrl || '',
               opacity: opacity,
+              rotation: rotation,
               label: label,
               domElement: hotspotVisual,
               originalHotspotRef: hotspot
@@ -278,8 +286,10 @@ export default function MarzipanoViewer() {
                     body: JSON.stringify({
                       sourceSceneId: sceneData.sceneId,
                       targetSceneId: hotspot.targetSceneId,
-                      yaw: coords.yaw,
-                      pitch: coords.pitch
+                      yaw: hotspot.yaw,
+                      pitch: hotspot.pitch,
+                      newYaw: coords.yaw,
+                      newPitch: coords.pitch
                     })
                   })
                 .then(res => {
@@ -290,7 +300,11 @@ export default function MarzipanoViewer() {
                   return res.json();
                 })
                   .then(data => {
-                    if (data.success) console.log("✅ تم حفظ الإحداثيات تلقائياً في ملف JSON!");
+                    if (data.success) {
+                      console.log("✅ تم حفظ الإحداثيات تلقائياً في ملف JSON!");
+                      hotspot.yaw = coords.yaw;
+                      hotspot.pitch = coords.pitch;
+                    }
                     else console.error("❌ حدث خطأ أثناء الحفظ:", data.error);
                   })
                   .catch(err => console.error("❌ فشل الاتصال بالخادم للحفظ:", err));
@@ -413,7 +427,7 @@ export default function MarzipanoViewer() {
     }
     const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
     if (iconContainer) {
-      iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity);
+      iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity, editingHotspot.rotation);
     }
 
     // تحديث الوجهة في الذاكرة فوراً لتجنب الحاجة لعمل ريفريش
@@ -428,15 +442,24 @@ export default function MarzipanoViewer() {
         body: JSON.stringify({
           sourceSceneId: editingHotspot.sourceSceneId,
           targetSceneId: editingHotspot.targetSceneId,
+          yaw: editingHotspot.yaw,
+          pitch: editingHotspot.pitch,
           newTargetSceneId: editingHotspot.newTargetSceneId,
           type: editingHotspot.type,
           customImageUrl: editingHotspot.customImageUrl,
           opacity: editingHotspot.opacity,
-          label: editingHotspot.label
+          label: editingHotspot.label,
+          rotation: editingHotspot.rotation
         })
       });
-      if (!res.ok) {
-        console.warn("مسار الحفظ قيد التجهيز من قبل Turbopack...");
+      if (res.ok) {
+        editingHotspot.originalHotspotRef.type = editingHotspot.type;
+        editingHotspot.originalHotspotRef.customImageUrl = editingHotspot.customImageUrl || '';
+        editingHotspot.originalHotspotRef.opacity = editingHotspot.opacity;
+        editingHotspot.originalHotspotRef.label = editingHotspot.label || '';
+        editingHotspot.originalHotspotRef.rotation = editingHotspot.rotation || 0;
+      } else {
+        console.warn("مسار الحفظ غير موجود أو به خطأ...");
       }
     } catch (e) {
       console.error("❌ حدث خطأ أثناء الحفظ:", e);
@@ -585,6 +608,36 @@ export default function MarzipanoViewer() {
           50% { transform: scale(1.5); opacity: 0.2; }
         }
 
+        /* 4. السهم الثلاثي الأبعاد المتحرك (معدل ليتوافق مع Marzipano) */
+        .hs-3d-arrow {
+          width: 60px;
+          height: 60px;
+          position: relative;
+        }
+        .hs-3d-arrow .arrow-body {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          animation: arrow-move 2s infinite ease-in-out;
+        }
+        .hs-3d-arrow .arrow-body::before {
+          content: '';
+          position: absolute;
+          width: 40%;
+          height: 40%;
+          border-style: solid;
+          border-color: #00ffcc;
+          border-width: 6px 0 0 6px;
+          transform: translate(-50%, -50%) rotate(45deg);
+          top: 50%;
+          left: 50%;
+          box-shadow: -2px -2px 12px rgba(0, 255, 204, 0.8);
+        }
+        @keyframes arrow-move {
+          0%, 100% { transform: translateY(10px) scale(0.9); opacity: 0.6; }
+          50% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+        }
+
         /* --- تنسيقات النقطة التفاعلية والنص التوضيحي --- */
         .hotspot-visual {
           position: absolute;
@@ -710,7 +763,8 @@ export default function MarzipanoViewer() {
                     { id: 'ground-radar', label: 'رادار أرضي' },
                     { id: 'orb', label: 'كرة زجاجية' },
                     { id: 'map-pin', label: 'دبوس' },
-                    { id: 'arrow', label: 'سهم عائم' }
+                    { id: 'arrow', label: 'سهم عائم' },
+                    { id: '3d-arrow', label: 'سهم ثلاثي الأبعاد' }
                   ].map(shape => (
                     <button
                       key={shape.id}
@@ -757,6 +811,24 @@ export default function MarzipanoViewer() {
                   style={{ width: '100%', cursor: 'pointer' }}
                 />
               </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+            <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>اتجاه السهم (Rotation): {editingHotspot.rotation || 0}°</label>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              step="5"
+              value={editingHotspot.rotation || 0}
+              onChange={(e) => {
+                const newRot = parseInt(e.target.value);
+                setEditingHotspot({...editingHotspot, rotation: newRot});
+                const iconContainer = editingHotspot.domElement.querySelector('.hs-icon-container');
+                if (iconContainer) iconContainer.innerHTML = getHotspotStyle(editingHotspot.type, editingHotspot.customImageUrl, editingHotspot.opacity, newRot);
+              }}
+              style={{ width: '100%', cursor: 'pointer' }}
+            />
+          </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
             <label style={{ fontSize: '14px', color: '#aaa', fontWeight: 'bold' }}>اسم الغرفة (يظهر عند الوقوف بالماوس):</label>
